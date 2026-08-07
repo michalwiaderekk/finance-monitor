@@ -10,7 +10,16 @@ with pdfplumber.open('C:\\Users\\rwiad\\Desktop\\finance-monitor\\data\\wyciag.p
         text = page.extract_text()
         if re.findall(r"\d{2} \d{4} \d{4} \d{4} \d{4} \d{4} \d{4}", text) != []:
             account_number = re.findall(r"\d{2} \d{4} \d{4} \d{4} \d{4} \d{4} \d{4}", text)
-        raw_data = re.findall(r"(^\d{4}-\d{2}-\d{2}) (.*) (-?\d+\.\d{2}) (\d+\.\d{2})",text, re.MULTILINE)
+        lines = text.split('\n')
+        raw_data = []
+        for i, line in enumerate(lines):
+            if re.match("(^\d{4}-\d{2}-\d{2}) (.*) (-?\d+\.\d{2}) (\d+\.\d{2})", line):
+                m = re.match("(^\d{4}-\d{2}-\d{2}) (.*) (-?\d+\.\d{2}) (\d+\.\d{2})",line)
+                if m:
+                    new_line = m.groups() + (lines[i + 1],)
+                print(new_line)
+                raw_data.append(new_line)
+        print(raw_data)
         for row in raw_data:
             acc = (account_number[0],)
             new_row = row + acc
@@ -18,9 +27,8 @@ with pdfplumber.open('C:\\Users\\rwiad\\Desktop\\finance-monitor\\data\\wyciag.p
     #print(data)
     sum = 0.0
     for row in data:
-        if row[4] == '21 1160 2202 0000 0003 6355 9336':
+        if row[5] == '21 1160 2202 0000 0003 6355 9336':
             continue
         elif float(row[2]) < 0.0:
             sum += float(row[2])
-            print(f'{sum} += {row[2]}')
     print(sum)
